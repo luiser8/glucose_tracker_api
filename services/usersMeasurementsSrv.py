@@ -6,8 +6,11 @@ class usersMeasurementsSrv():
     def __init__(self):
         self.query_service = repoSQL('users_measurements', ['id', 'user_id', 'date', 'hour', 'value'])
 
-    def getAllSrv(self):
-        response =  self.query_service.get_all()
+    def getAllByUserIdSrv(self, user_id):
+        response = self.query_service.get_by_conditions({
+            "user_id": user_id
+        })
+        #response =  self.query_service.get_all()
         if response:
             return responseHttpUtils().response("Measurements founds successfully", 200, response)
         else:

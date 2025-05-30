@@ -8,8 +8,9 @@ measurements = Blueprint('measurements', __name__)
 class publicationsCtrl():
     @measurements.route('/api/measurements/get', methods=['GET'])
     @authorize
-    def getAll():
-        response = usersMeasurementsSrv().getAllSrv()
+    def getAllByUser():
+        user_id = tokenJWTUtils().getTokenUserId(request.headers)["user_id"]
+        response = usersMeasurementsSrv().getAllByUserIdSrv(user_id)
         return jsonify(response), response["status"]
 
     @measurements.route('/api/measurements/get/<int:id>', methods=['GET'])
