@@ -23,6 +23,8 @@ class authSrv:
                 "password": password
             })
             if result:
+                if result[0]["status"] == False:
+                    return responseHttpUtils().response("User is inactive", 403, None)
                 tokens = self.generate_token.generate(result)
                 if tokens and result:
                     self.users_auth_service.postSrv({
@@ -43,6 +45,8 @@ class authSrv:
         if user_id:
             result = self.query_service.get_by_id(user_id)
             if result:
+                if result[0]["status"] == False:
+                    return responseHttpUtils().response("User is inactive", 403, None)
                 tokens = self.generate_token.generate(result)
                 if tokens and result:
                     self.users_auth_service.postSrv({

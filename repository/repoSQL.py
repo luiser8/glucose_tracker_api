@@ -56,6 +56,44 @@ class repoSQL:
         cur.close()
         return [json.loads(row[0]) for row in data]
 
+    def get_by_between(self, conditions=None, date_range_conditions=None):
+        cur = pgsqlConn.cursor()
+        select_part = sql.SQL(',').join(map(sql.Identifier, self.columns))
+
+        where_clauses = []
+        params = []
+
+        if conditions:
+            for col, val in conditions.items():
+                where_clauses.append(sql.SQL("{} = %s").format(sql.Identifier(col)))
+                params.append(val)
+
+        if date_range_conditions:
+            for col, (start_date, end_date) in date_range_conditions.items():
+                where_clauses.append(
+                    sql.SQL("{} BETWEEN %s AND %s").format(sql.Identifier(col))
+                )
+                params.extend([start_date, end_date])
+
+        if where_clauses:
+            where_part = sql.SQL(' AND ').join(where_clauses)
+            query = sql.SQL('SELECT CAST(row_to_json(row) as text) FROM (SELECT {} FROM {} WHERE {}) row;').format(
+                select_part,
+                sql.Identifier(self.table_name),
+                where_part
+            )
+            cur.execute(query, tuple(params))
+        else:
+            query = sql.SQL('SELECT CAST(row_to_json(row) as text) FROM (SELECT {} FROM {}) row;').format(
+                select_part,
+                sql.Identifier(self.table_name)
+            )
+            cur.execute(query)
+
+        data = cur.fetchall()
+        cur.close()
+        return [json.loads(row[0]) for row in data]
+
     def insert(self, data):
         try:
             cur = pgsqlConn.cursor()

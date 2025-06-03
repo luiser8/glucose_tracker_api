@@ -1,4 +1,3 @@
-from flask import flash
 from repository.repoSQL import repoSQL
 from middleware.responseHttpUtils import responseHttpUtils
 

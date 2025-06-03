@@ -1,4 +1,3 @@
-from flask import flash
 from repository.repoSQL import repoSQL
 from middleware.responseHttpUtils import responseHttpUtils
 
@@ -10,7 +9,6 @@ class usersMeasurementsSrv():
         response = self.query_service.get_by_conditions({
             "user_id": user_id
         })
-        #response =  self.query_service.get_all()
         if response:
             return responseHttpUtils().response("Measurements founds successfully", 200, response)
         else:
@@ -20,6 +18,16 @@ class usersMeasurementsSrv():
         response = self.query_service.get_by_id(id)
         if response:
             return responseHttpUtils().response("Measurements found by id successfully", 200, response)
+        else:
+            return responseHttpUtils().response("Error listing measurements not found", 404, response)
+
+    def getByDateRangeSrv(self, user_id, start_date, end_date):
+        response = self.query_service.get_by_between(
+            conditions={"user_id": user_id},
+            date_range_conditions={"date": (start_date, end_date)}
+        )
+        if response:
+            return responseHttpUtils().response("Measurements found by date range successfully", 200, response)
         else:
             return responseHttpUtils().response("Error listing measurements not found", 404, response)
 

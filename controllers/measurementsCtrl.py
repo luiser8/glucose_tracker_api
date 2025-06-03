@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from middleware.rateLimit import rate_limit
 from middleware.verifyAuth import authorize
 from services.usersMeasurementsSrv import usersMeasurementsSrv
 from middleware.tokenJWTUtils import tokenJWTUtils
@@ -19,8 +20,16 @@ class publicationsCtrl():
         response = usersMeasurementsSrv().getByIdSrv(id)
         return jsonify(response), response["status"]
 
+    @measurements.route('/api/measurements/get/start_date/<string:start_date>/end_date/<string:end_date>', methods=['GET'])
+    @authorize
+    def getByDateRange(start_date, end_date):
+        user_id = tokenJWTUtils().getTokenUserId(request.headers)["user_id"]
+        response = usersMeasurementsSrv().getByDateRangeSrv(user_id, start_date, end_date)
+        return jsonify(response), response["status"]
+
     @measurements.route('/api/measurements/post', methods=['POST'])
     @authorize
+    @rate_limit()
     def post():
         user_id = tokenJWTUtils().getTokenUserId(request.headers)["user_id"]
         data = request.get_json()
@@ -30,6 +39,7 @@ class publicationsCtrl():
 
     @measurements.route('/api/measurements/put/<int:id>', methods=['PUT'])
     @authorize
+    @rate_limit()
     def put(id):
         user_id = tokenJWTUtils().getTokenUserId(request.headers)["user_id"]
         data = request.get_json()
@@ -39,6 +49,7 @@ class publicationsCtrl():
 
     @measurements.route('/api/measurements/delete/<int:id>', methods=['DELETE'])
     @authorize
+    @rate_limit()
     def delete(id):
         save = usersMeasurementsSrv().deleteSrv(id)
         return jsonify(save), save["status"]

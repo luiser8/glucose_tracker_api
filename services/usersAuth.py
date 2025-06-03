@@ -1,11 +1,11 @@
-from flask import flash
+from datetime import datetime
 from repository.repoSQL import repoSQL
 from middleware.responseHttpUtils import responseHttpUtils
 
 class usersAuthSrv():
     def __init__(self):
         self.result = None
-        self.query_service = repoSQL('users_auth', ['id', 'user_id', 'access_token', 'refresh_token'])
+        self.query_service = repoSQL('users_auth', ['id', 'user_id', 'access_token', 'refresh_token', 'createdat', 'updatedat'])
 
     def getByIdSrv(self, id):
         response = self.query_service.get_by_conditions({
@@ -20,13 +20,15 @@ class usersAuthSrv():
         user_data = {
             "user_id": payload["user_id"],
             "access_token": payload["access_token"],
-            "refresh_token": payload["refresh_token"]
+            "refresh_token": payload["refresh_token"],
+            "createdat": datetime.now()
         }
 
         user_exists = self.getByIdSrv(payload["user_id"])
 
         if user_exists:
             if payload["user_id"] == user_exists[0]["user_id"]:
+                user_data["updatedat"] = datetime.now()
                 self.result =self.query_service.update(user_exists[0]["id"], user_data)
             else:
                 return responseHttpUtils().response("User ID does not match stored user", None, None)
