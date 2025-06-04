@@ -1,0 +1,45 @@
+version: "3.13"
+
+services:
+  flask_app_glucose:
+    container_name: flask_app_glucose
+    image: dockerhub-flask_live_app_glucose:1.0.0
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - APP_NAME="Tracking Glucose Average"
+      - APP_NAME_DESCRIPTION="App Flask Tracking Glucose Average"
+      - DB_URL="host=localhost port=5432 dbname=glucose_tracker_db user=postgresUser password=@lerDev.pg"
+      - PORT_APP=3000
+      - SECRET_KEY="my_secret_key"
+      - ALGORITHM="HS256"
+      - EXPIRES_IN=100
+      - EXPIRES_RECOVERY_CODE=100
+      - RANDOM_CODE_LENGTH=5
+      - RANDOM_CODE_STR="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+      - LIMIT=10
+      - PER=1
+      - ADA_HBA1C_INTERCEPT=46.7
+      - ADA_HBA1C_SLOPE=28.7
+      - RCI=8
+      - FSI=20
+      - MIN_GLUCOSE_CAL=70
+      - MAX_GLUCOSE_CAL=100
+    command: flask run --host=0.0.0.0 --port=3000
+    depends_on:
+      - glucose_tracker_db
+  glucose_tracker_db:
+    container_name: glucose_tracker_db
+    image: postgres:17.4
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=@lerDev.pg
+      - POSTGRES_USER=postgresUser
+      - POSTGRES_DB=glucose_tracker_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init_db:/docker-entrypoint-initdb.d
+volumes:
+  pgdata: {}

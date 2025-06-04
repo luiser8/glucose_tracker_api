@@ -1,5 +1,7 @@
 # API de Glucosa
-
+## up / down app docker
+### docker compose down glucose_tracker_db
+### docker compose up -d glucose_tracker_db
 ## Endpoints
 
 ### HBA1C

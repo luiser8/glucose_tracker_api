@@ -4,5 +4,5 @@ import os
 
 load_dotenv()
 
-url = os.getenv("DB")
+url = os.getenv("DB_URL")
 pgsqlConn = connect(url)

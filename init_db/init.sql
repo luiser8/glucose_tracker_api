@@ -1,5 +1,3 @@
-CREATE DATABASE glucose_tracker_db;
-
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     firstname VARCHAR NOT NULL,
