@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from middleware.rateLimit import rate_limit
 from services.usersSrv import usersSrv
 from middleware.verifyAuth import authorize
+from schemas.userSchema import UserSchema, ChangePasswordSchema
 
 users = Blueprint('users', __name__)
 
@@ -23,26 +24,24 @@ class usersCtrl():
     @users.route('/api/users/post', methods=['POST'])
     @rate_limit()
     def post():
-        data = request.get_json()
-        payload = { "firstname": data.get("firstname"), "lastname": data.get("lastname"), "email": data.get("email"), "password": data.get("password") }
-        save = usersSrv().postSrv(payload)
-        return jsonify(save), save["status"]
+        payload = UserSchema().load(request.get_json())
+        response = usersSrv().postSrv(payload)
+        return jsonify(response), response["status"]
 
     @users.route('/api/users/put/<int:id>', methods=['PUT'])
     @authorize
     @rate_limit()
     def put(id):
-        data = request.get_json()
-        payload = { "firstname": data.get("firstname"), "lastname": data.get("lastname"), "email": data.get("email"), "password": data.get("password"), "status": data.get("status") }
-        save = usersSrv().putSrv(id, payload)
-        return jsonify(save), save["status"]
+        payload = UserSchema().load(request.get_json())
+        response = usersSrv().putSrv(id, payload)
+        return jsonify(response), response["status"]
 
     @users.route('/api/users/delete/<int:id>', methods=['DELETE'])
     @authorize
     @rate_limit()
     def delete(id):
-        save = usersSrv().deleteSrv(id)
-        return jsonify(save), save["status"]
+        response = usersSrv().deleteSrv(id)
+        return jsonify(response), response["status"]
 
     @users.route('/api/users/forgot_password/<string:email>', methods=['GET'])
     def forgotPassword(email):
@@ -51,7 +50,6 @@ class usersCtrl():
 
     @users.route('/api/users/change_password', methods=['POST'])
     def changePassword():
-        data = request.get_json()
-        payload = { "code": data.get("code"), "email": data.get("email"), "newpassword": data.get("newpassword") }
+        payload = ChangePasswordSchema().load(request.get_json())
         result = usersSrv().changePasswordSrv(payload)
         return jsonify(result), result["status"]

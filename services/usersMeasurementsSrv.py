@@ -31,10 +31,10 @@ class usersMeasurementsSrv():
         else:
             return responseHttpUtils().response("Error listing measurements not found", 404, response)
 
-    def postSrv(self, payload):
+    def postSrv(self, user_id, payload):
         if payload:
             meas_data = {
-                'user_id': payload["user_id"],
+                'user_id': user_id,
                 "date": payload["date"],
                 "hour": payload["hour"],
                 "value": payload["value"]
@@ -48,10 +48,10 @@ class usersMeasurementsSrv():
             else:
                 return responseHttpUtils().response("Error add measurements", 400, result)
 
-    def putSrv(self, id, payload):
+    def putSrv(self, id, user_id, payload):
         if payload:
             meas_data = {
-                'user_id': payload["user_id"],
+                'user_id': user_id,
                 "date": payload["date"],
                 "hour": payload["hour"],
                 "value": payload["value"]

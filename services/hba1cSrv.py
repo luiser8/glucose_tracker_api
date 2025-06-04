@@ -23,10 +23,10 @@ class hba1cSrv():
         response = round(hba1c, 2)
         return responseHttpUtils().response("HBA1c calculated successfully", 200, {"hba1c": response})
 
-    def calculate_dosis(self, payload):
+    def calculate_dosis(self, user_id, payload):
         if payload:
             data = {
-                'user_id': payload["user_id"],
+                'user_id': user_id,
                 "actual_glucose": payload["actual_glucose"],
                 "objective_glucose": payload["objective_glucose"],
                 "carbohydrates": payload["carbohydrates"],

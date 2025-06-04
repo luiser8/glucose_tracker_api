@@ -3,6 +3,7 @@ from middleware.rateLimit import rate_limit
 from middleware.verifyAuth import authorize
 from services.usersMeasurementsSrv import usersMeasurementsSrv
 from middleware.tokenJWTUtils import tokenJWTUtils
+from schemas.measurementsSchema import MeasurementsSchema
 
 measurements = Blueprint('measurements', __name__)
 
@@ -32,24 +33,22 @@ class publicationsCtrl():
     @rate_limit()
     def post():
         user_id = tokenJWTUtils().getTokenUserId(request.headers)["user_id"]
-        data = request.get_json()
-        payload = { "user_id": user_id, "date": data.get("date"), "hour": data.get("hour"), "value": data.get("value") }
-        save = usersMeasurementsSrv().postSrv(payload)
-        return jsonify(save), save["status"]
+        payload = MeasurementsSchema().load(request.get_json())
+        response = usersMeasurementsSrv().postSrv(user_id, payload)
+        return jsonify(response), response["status"]
 
     @measurements.route('/api/measurements/put/<int:id>', methods=['PUT'])
     @authorize
     @rate_limit()
     def put(id):
         user_id = tokenJWTUtils().getTokenUserId(request.headers)["user_id"]
-        data = request.get_json()
-        payload = { "user_id": user_id, "date": data.get("date"), "hour": data.get("hour"), "value": data.get("value") }
-        save = usersMeasurementsSrv().putSrv(id, payload)
-        return jsonify(save), save["status"]
+        payload = MeasurementsSchema().load(request.get_json())
+        response = usersMeasurementsSrv().putSrv(id, user_id, payload)
+        return jsonify(response), response["status"]
 
     @measurements.route('/api/measurements/delete/<int:id>', methods=['DELETE'])
     @authorize
     @rate_limit()
     def delete(id):
-        save = usersMeasurementsSrv().deleteSrv(id)
-        return jsonify(save), save["status"]
+        request = usersMeasurementsSrv().deleteSrv(id)
+        return jsonify(request), request["status"]

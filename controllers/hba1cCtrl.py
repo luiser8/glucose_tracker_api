@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from middleware.verifyAuth import authorize
+from schemas.hba1cSchema import HbA1cSchema
 from services.hba1cSrv import hba1cSrv
 from middleware.tokenJWTUtils import tokenJWTUtils
 
@@ -18,7 +19,6 @@ class hba1cCtrl():
     @authorize
     def calculate_dosis():
         user_id = tokenJWTUtils().getTokenUserId(request.headers)["user_id"]
-        data = request.get_json()
-        payload = { "user_id": user_id, "actual_glucose": data.get("actual_glucose"), "objective_glucose": data.get("objective_glucose"), "carbohydrates": data.get("carbohydrates") }
-        response = hba1cSrv().calculate_dosis(payload)
+        payload = HbA1cSchema().load(request.get_json())
+        response = hba1cSrv().calculate_dosis(user_id, payload)
         return jsonify(response), response["status"]

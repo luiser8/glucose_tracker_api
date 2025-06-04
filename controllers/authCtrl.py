@@ -3,6 +3,7 @@ from middleware.rateLimit import rate_limit
 from middleware.tokenJWTUtils import tokenJWTUtils
 from middleware.verifyAuth import authorize
 from services.authSrv import authSrv
+from schemas.AuthSchema import AuthSchema
 
 auth = Blueprint('auth', __name__)
 
@@ -11,8 +12,7 @@ class authCtrl():
     @auth.route('/api/auth/login', methods=['POST'])
     @rate_limit()
     def login():
-        data = request.get_json()
-        payload = { "email": data.get("email"), "password": data.get("password") }
+        payload = AuthSchema().load(request.get_json())
         response = authSrv().loginSrv(payload)
         return jsonify(response), response["status"]
 
