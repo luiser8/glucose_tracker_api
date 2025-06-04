@@ -1,5 +1,5 @@
 from middleware.responseHttpUtils import responseHttpUtils
-from middleware.timeUtils import timeUtils
+from middleware.dateTimeUtils import dateTimeUtils
 from repository.repoSQL import repoSQL
 from middleware.hashPass import hash_password
 from services.usersForgotSrv import usersForgotSrv
@@ -77,7 +77,7 @@ class usersSrv():
                 exists = self.users_forgot_service.getByIdSrv(result[0]["id"])
                 self.code = self.mailer_send_service.sendSrv(result[0]["email"])
                 if exists and any(exist["status"] for exist in exists):
-                    intime_expired_code = timeUtils().getTime(exists[0]["createdat"])
+                    intime_expired_code = dateTimeUtils().getTime(exists[0]["createdat"])
                     if intime_expired_code is True:
                         self.users_forgot_service.putSrv(exists[0]["id"], {
                             "user_id": result[0]["id"],
@@ -104,7 +104,7 @@ class usersSrv():
             if result and len(result) > 0:
                 exists = self.users_forgot_service.getByCodeSrv(payload["code"])
                 if exists and any(exist["status"] for exist in exists):
-                    intime_expired_code = timeUtils().getTime(exists[0]["createdat"])
+                    intime_expired_code = dateTimeUtils().getTime(exists[0]["createdat"])
                     if intime_expired_code is False:
                         self.users_forgot_service.putSrv(exists[0]["id"], {
                             "user_id": result[0]["id"],

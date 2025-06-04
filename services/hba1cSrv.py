@@ -1,6 +1,7 @@
 import math
 import os
 from middleware.responseHttpUtils import responseHttpUtils
+from middleware.dateTimeUtils import dateTimeUtils
 from services.usersMeasurementsSrv import usersMeasurementsSrv
 
 class hba1cSrv():
@@ -14,13 +15,19 @@ class hba1cSrv():
         self.users_measurements = usersMeasurementsSrv()
 
     def getByUserHba1cSrv(self, user_id, start_date, end_date):
+        date_utils = dateTimeUtils().getCalculateDates()
+        start_date = start_date if start_date is not None else date_utils["date_3_months_ago"]
+        end_date = end_date if end_date is not None else date_utils["current_date"]
+
         result = self.users_measurements.getByDateRangeSrv(user_id, start_date, end_date)
         if not result or "data" not in result or not result["data"]:
             return responseHttpUtils().response("Error listing measurements", 400, result)
+
         values = [item['value'] for item in result["data"] if 'value' in item]
         avg_glucose = sum(values) / len(values)
         hba1c = (avg_glucose + self.ADA_HBA1C_INTERCEPT) / self.ADA_HBA1C_SLOPE
         response = round(hba1c, 2)
+
         return responseHttpUtils().response("HBA1c calculated successfully", 200, {"hba1c": response})
 
     def calculate_dosis(self, user_id, payload):

@@ -8,9 +8,16 @@ hba1c = Blueprint('hba1c', __name__)
 
 class hba1cCtrl():
 
+    @hba1c.route('/api/hba1c/get', methods=['GET'])
+    @authorize
+    def getByHba1c():
+        user_id = tokenJWTUtils().getTokenUserId(request.headers)["user_id"]
+        response = hba1cSrv().getByUserHba1cSrv(user_id, None, None)
+        return jsonify(response), response["status"]
+
     @hba1c.route('/api/hba1c/get/start_date/<string:start_date>/end_date/<string:end_date>', methods=['GET'])
     @authorize
-    def getByHba1c(start_date, end_date):
+    def getByHba1cByDates(start_date, end_date):
         user_id = tokenJWTUtils().getTokenUserId(request.headers)["user_id"]
         response = hba1cSrv().getByUserHba1cSrv(user_id, start_date, end_date)
         return jsonify(response), response["status"]
