@@ -2,6 +2,7 @@
 
 ## Endpoints
 
+### HBA1C
 ### GET `/hba1c/get/start_date/<fecha>/end_date/<fecha>`
 Calcula el HbA1c basado en mediciones de glucosa.
 
