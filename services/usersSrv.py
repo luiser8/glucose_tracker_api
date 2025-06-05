@@ -7,7 +7,8 @@ from services.mailerSendSrv import mailerSendSrv
 
 class usersSrv():
     def __init__(self):
-        self.query_service = repoSQL('users', ['id', 'firstname', 'lastname', 'email', 'password', 'status'])
+        self.query_service = repoSQL('users', ['id', 'firstname', 'lastname', 'email', 'phone', 'password', 'status'])
+        self.query_service_personal_data = repoSQL('users_personal_data', ['id', 'user_id', 'sex', 'address', 'date_of_birth', 'country', 'city'])
         self.mailer_send_service = mailerSendSrv()
         self.users_forgot_service = usersForgotSrv()
         self.code = None
@@ -34,17 +35,26 @@ class usersSrv():
             if result and len(result) > 0:
                 return responseHttpUtils().response("Email already exists", 400, None)
             else:
-                user_data = {
+                user_simple_data = {
                     "firstname": payload["firstname"],
                     "lastname": payload["lastname"],
                     "email": payload["email"],
+                    "phone": payload["phone"],
                     "password": hash_password(payload["password"])
                 }
                 if "id" in payload:
-                    user_data["id"] = payload["id"]
+                    user_simple_data["id"] = payload["id"]
                 if "status" in payload:
-                    user_data["status"] = payload["status"]
-                result = self.query_service.insert(user_data)
+                    user_simple_data["status"] = payload["status"]
+                result = self.query_service.insert(user_simple_data)
+                self.query_service_personal_data.insert({
+                    "user_id": result,
+                    "sex": payload["sex"],
+                    "address": payload["address"],
+                    "date_of_birth": payload["date_of_birth"],
+                    "country": payload["country"],
+                    "city": payload["city"]
+                })
                 if result:
                     return responseHttpUtils().response("User added successfully", 201, result)
                 else:
@@ -52,17 +62,26 @@ class usersSrv():
 
     def putSrv(self, id, payload):
         if payload:
-            user_data = {
+            user_simple_data = {
                 "firstname": payload["firstname"],
                 "lastname": payload["lastname"],
                 "email": payload["email"],
+                "phone": payload["phone"],
                 "password": hash_password(payload["password"])
             }
             if "id" in payload:
-                user_data["id"] = payload["id"]
+                user_simple_data["id"] = payload["id"]
             if "status" in payload:
-                user_data["status"] = payload["status"]
-            result = self.query_service.update(id, user_data)
+                user_simple_data["status"] = payload["status"]
+            result = self.query_service.update(id, user_simple_data)
+            self.query_service_personal_data.insert({
+                "user_id": id,
+                "sex": payload["sex"],
+                "address": payload["address"],
+                "date_of_birth": payload["date_of_birth"],
+                "country": payload["country"],
+                "city": payload["city"]
+            })
             if result:
                 return responseHttpUtils().response("User updated successfully", 200, result)
             else:

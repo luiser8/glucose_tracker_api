@@ -94,23 +94,85 @@ class repoSQL:
         cur.close()
         return [json.loads(row[0]) for row in data]
 
+    def get_with_joins(self, joins, select_columns=None, conditions=None):
+        cur = pgsqlConn.cursor()
+
+        if not select_columns:
+            select_part = sql.SQL('*')
+        else:
+            select_part = sql.SQL(',').join(
+                sql.SQL("{}.{}").format(
+                    sql.Identifier(col.split('.')[0]),
+                    sql.Identifier(col.split('.')[1])
+                ) for col in select_columns
+            )
+
+        join_parts = []
+        for join in joins:
+            join_conditions = [
+                sql.SQL("{}.{} = {}.{}").format(
+                    sql.Identifier(src_col.split('.')[0]),
+                    sql.Identifier(src_col.split('.')[1]),
+                    sql.Identifier(dst_col.split('.')[0]),
+                    sql.Identifier(dst_col.split('.')[1])
+                ) for src_col, dst_col in join['on'].items()
+            ]
+            join_parts.append(
+                sql.SQL("INNER JOIN {} ON {}").format(
+                    sql.Identifier(join['table']),
+                    sql.SQL(' AND ').join(join_conditions)
+                )
+            )
+
+        where_part = sql.SQL('')
+        params = []
+        if conditions:
+            where_clauses = [
+                sql.SQL("{}.{} = %s").format(
+                    sql.Identifier(col.split('.')[0]),
+                    sql.Identifier(col.split('.')[1]))
+                for col in conditions.keys()
+            ]
+            where_part = sql.SQL('WHERE {}').format(
+                sql.SQL(' AND ').join(where_clauses)
+            )
+            params = list(conditions.values())
+
+        query = sql.SQL("""
+            SELECT CAST(row_to_json(row) as text)
+            FROM (
+                SELECT {} FROM {} {} {}
+            ) row
+        """).format(
+            select_part,
+            sql.Identifier(self.table_name),
+            sql.SQL(' ').join(join_parts),
+            where_part
+        )
+
+        cur.execute(query, params)
+        data = cur.fetchall()
+        cur.close()
+        return [json.loads(row[0]) for row in data]
+
     def insert(self, data):
         try:
             cur = pgsqlConn.cursor()
             columns = list(data.keys())
             values = tuple(data[col] for col in columns)
-            stmt = sql.SQL("INSERT INTO {} ({}) VALUES ({})").format(
+            stmt = sql.SQL("INSERT INTO {} ({}) VALUES ({}) RETURNING id").format(
                 sql.Identifier(self.table_name),
                 sql.SQL(',').join(map(sql.Identifier, columns)),
                 sql.SQL(',').join(sql.Placeholder() * len(columns))
             )
             cur.execute(stmt, values)
+            inserted_id = int(cur.fetchone()[0])
             pgsqlConn.commit()
             cur.close()
-            return True
+            return inserted_id
         except Exception as e:
             print(f"Error: {e}")
-            return False
+            return None
 
     def update(self, record_id, data):
         try:

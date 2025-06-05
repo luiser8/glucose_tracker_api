@@ -10,18 +10,28 @@ class authSrv:
         self.secret_key = os.getenv("SECRET_KEY")
         self.secret_key_algorithm = os.getenv("ALGORITHM")
         self.expires_in = int(os.getenv("EXPIRES_IN"))
-        self.query_service = repoSQL('users', ['id', 'email', 'firstname', 'lastname', 'status'])
+        self.query_service = repoSQL('users', ['id', 'email', 'phone', 'firstname', 'lastname', 'status', 'sex', 'address', 'date_of_birth', 'country', 'city'])
         self.users_auth_service = usersAuthSrv()
         self.generate_token = tokenJWTUtils()
 
     def loginSrv(self, payload):
         if payload:
-            email = payload["email"]
-            password = hash_password(payload["password"])
-            result = self.query_service.get_by_conditions({
-                "email": email,
-                "password": password
-            })
+            result = self.query_service.get_with_joins(
+                joins=[{
+                    'table': 'users_personal_data',
+                    'on': {'users.id': 'users_personal_data.user_id'}
+                }],
+                select_columns=[
+                    'users.id', 'users.email', 'users.phone', 'users.firstname',
+                    'users.lastname', 'users.status', 'users_personal_data.sex',
+                    'users_personal_data.address', 'users_personal_data.date_of_birth',
+                    'users_personal_data.country', 'users_personal_data.city'
+                ],
+                conditions={
+                    'users.email': payload["email"],
+                    'users.password': hash_password(payload["password"])
+                }
+            )
             if result:
                 if result[0]["status"] == False:
                     return responseHttpUtils().response("User is inactive", 403, None)
@@ -43,7 +53,21 @@ class authSrv:
 
     def refreshSrv(self, user_id):
         if user_id:
-            result = self.query_service.get_by_id(user_id)
+            result = self.query_service.get_with_joins(
+                joins=[{
+                    'table': 'users_personal_data',
+                    'on': {'users.id': 'users_personal_data.user_id'}
+                }],
+                select_columns=[
+                    'users.id', 'users.email', 'users.phone', 'users.firstname',
+                    'users.lastname', 'users.status', 'users_personal_data.sex',
+                    'users_personal_data.address', 'users_personal_data.date_of_birth',
+                    'users_personal_data.country', 'users_personal_data.city'
+                ],
+                conditions={
+                    'users.id': user_id
+                }
+            )
             if result:
                 if result[0]["status"] == False:
                     return responseHttpUtils().response("User is inactive", 403, None)

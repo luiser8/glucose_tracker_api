@@ -22,6 +22,11 @@ class tokenJWTUtils():
             "lastname": payload[0]["lastname"],
             "email": payload[0]["email"],
             "status": payload[0]["status"],
+            "sex": payload[0]["sex"],
+            "address": payload[0]["address"],
+            "date_of_birth": payload[0]["date_of_birth"],
+            "country": payload[0]["country"],
+            "city": payload[0]["city"],
             "exp": (datetime.datetime.now() + datetime.timedelta(minutes=self.expires_in)).timestamp()
         }, self.secret_key, self.secret_key_algorithm)
 
@@ -31,6 +36,11 @@ class tokenJWTUtils():
             "lastname": payload[0]["lastname"],
             "email": payload[0]["email"],
             "status": payload[0]["status"],
+            "sex": payload[0]["sex"],
+            "address": payload[0]["address"],
+            "date_of_birth": payload[0]["date_of_birth"],
+            "country": payload[0]["country"],
+            "city": payload[0]["city"],
             "exp": (datetime.datetime.now() + datetime.timedelta(minutes=self.expires_in * 7)).timestamp()
         }, self.secret_key, self.secret_key_algorithm)
 
