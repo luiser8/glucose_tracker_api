@@ -3,6 +3,7 @@ from middleware.rateLimit import rate_limit
 from services.usersSrv import usersSrv
 from middleware.verifyAuth import authorize
 from schemas.userSchema import UserSchema, ChangePasswordSchema
+from schemas.confirmationRegisterSchema import ConfirmRegistrationSchema
 
 users = Blueprint('users', __name__)
 
@@ -52,4 +53,10 @@ class usersCtrl():
     def changePassword():
         payload = ChangePasswordSchema().load(request.get_json())
         result = usersSrv().changePasswordSrv(payload)
+        return jsonify(result), result["status"]
+
+    @users.route('/api/users/confirm_registration', methods=['POST'])
+    def confirmRegistration():
+        payload = ConfirmRegistrationSchema().load(request.get_json())
+        result = usersSrv().confirmRegistrationSrv(payload)
         return jsonify(result), result["status"]

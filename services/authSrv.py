@@ -4,6 +4,7 @@ from middleware.responseHttpUtils import responseHttpUtils
 from repository.repoSQL import repoSQL
 from middleware.hashPass import hash_password
 from services.usersAuth import usersAuthSrv
+from services.usersRegistrationSrv import usersRegistrationSrv
 
 class authSrv:
     def __init__(self):
@@ -13,6 +14,7 @@ class authSrv:
         self.query_service = repoSQL('users', ['id', 'email', 'phone', 'firstname', 'lastname', 'status', 'sex', 'address', 'date_of_birth', 'country', 'city'])
         self.users_auth_service = usersAuthSrv()
         self.generate_token = tokenJWTUtils()
+        self.users_registration_service = usersRegistrationSrv()
 
     def loginSrv(self, payload):
         if payload:
@@ -33,8 +35,11 @@ class authSrv:
                 }
             )
             if result:
+                user_registration = self.users_registration_service.getByIdSrv(result[0]["id"], 1)
                 if result[0]["status"] == False:
                     return responseHttpUtils().response("User is inactive", 403, None)
+                if user_registration[0]["status"] == False:
+                    return responseHttpUtils().response("User registration not activate", 403, None)
                 tokens = self.generate_token.generate(result)
                 if tokens and result:
                     self.users_auth_service.postSrv({
@@ -69,8 +74,11 @@ class authSrv:
                 }
             )
             if result:
+                user_registration = self.users_registration_service.getByIdSrv(result[0]["id"], 1)
                 if result[0]["status"] == False:
                     return responseHttpUtils().response("User is inactive", 403, None)
+                if user_registration[0]["status"] == False:
+                    return responseHttpUtils().response("User registration not activate", 403, None)
                 tokens = self.generate_token.generate(result)
                 if tokens and result:
                     self.users_auth_service.postSrv({

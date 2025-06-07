@@ -23,6 +23,17 @@ CREATE TABLE users_personal_data (
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
+CREATE TABLE users_registration (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    type SMALLINT NOT NULL,
+    code VARCHAR NOT NULL,
+    status BOOLEAN NULL,
+    createdat TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedat TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
 CREATE TABLE users_measurements (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
@@ -39,16 +50,6 @@ CREATE TABLE users_auth (
     user_id INTEGER NOT NULL UNIQUE,
     access_token VARCHAR NOT NULL,
     refresh_token VARCHAR NOT NULL,
-    createdat TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    updatedat TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users (id)
-);
-
-CREATE TABLE users_forgot_password (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
-    code VARCHAR NOT NULL,
-    status BOOLEAN NULL DEFAULT true,
     createdat TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     updatedat TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users (id)

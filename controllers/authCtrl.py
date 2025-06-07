@@ -3,7 +3,7 @@ from middleware.rateLimit import rate_limit
 from middleware.tokenJWTUtils import tokenJWTUtils
 from middleware.verifyAuth import authorize
 from services.authSrv import authSrv
-from schemas.AuthSchema import AuthSchema
+from schemas.authSchema import AuthSchema
 
 auth = Blueprint('auth', __name__)
 
