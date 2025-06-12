@@ -4,7 +4,7 @@ from middleware.responseHttpUtils import responseHttpUtils
 class usersPersonalDataSrv():
     def __init__(self):
         self.result = None
-        self.query_service = repoSQL('users_personal_data', ['id', 'user_id', 'sex', 'address', 'date_of_birth', 'country', 'city'])
+        self.query_service = repoSQL('users_personal_data', ['id', 'user_id', 'photo', 'phone', 'sex', 'address', 'date_of_birth', 'country', 'city'])
 
     def getByIdSrv(self, id):
         response = self.query_service.get_by_id(id)
@@ -22,6 +22,7 @@ class usersPersonalDataSrv():
 
         user_data = {
             "user_id": payload["user_id"],
+            "phone": payload["phone"],
             "sex": payload["sex"],
             "address": payload["address"],
             "date_of_birth": payload["date_of_birth"],
@@ -44,6 +45,7 @@ class usersPersonalDataSrv():
 
         user_data = {
             "user_id": user_id,
+            "phone": payload["phone"],
             "sex": payload["sex"],
             "address": payload["address"],
             "date_of_birth": payload["date_of_birth"],

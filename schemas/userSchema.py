@@ -1,4 +1,15 @@
-from marshmallow import Schema, fields, validate
+from marshmallow import Schema, ValidationError, fields, validate
+
+class BytesField(fields.Field):
+    def _validate(self, value):
+        if not isinstance(value, bytes):
+            raise ValidationError('Invalid input type.')
+
+        if value is None or value == b'':
+            raise ValidationError('Invalid value')
+
+class UserPhotoSchema(Schema):
+    photo = BytesField(required=True)
 
 class UserSchema(Schema):
     firstname = fields.String(required=True, validate=validate.Length(min=3, max=100))

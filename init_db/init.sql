@@ -3,7 +3,6 @@ CREATE TABLE users (
     firstname VARCHAR NOT NULL,
     lastname VARCHAR NOT NULL,
     email VARCHAR NOT NULL UNIQUE,
-    phone VARCHAR NOT NULL,
     password VARCHAR NOT NULL,
     status BOOLEAN NULL DEFAULT true,
     createdat TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
@@ -13,6 +12,8 @@ CREATE TABLE users (
 CREATE TABLE users_personal_data (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
+    photo BYTEA NULL,
+    phone VARCHAR NULL,
     sex VARCHAR NOT NULL,
     address VARCHAR NOT NULL,
     date_of_birth VARCHAR NOT NULL,

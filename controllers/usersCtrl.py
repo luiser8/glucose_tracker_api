@@ -45,17 +45,20 @@ class usersCtrl():
         return jsonify(response), response["status"]
 
     @users.route('/api/users/forgot_password/<string:email>', methods=['GET'])
+    @rate_limit()
     def forgotPassword(email):
         result = usersSrv().forgotPasswordSrv(email)
         return jsonify(result), result["status"]
 
     @users.route('/api/users/change_password', methods=['POST'])
+    @rate_limit()
     def changePassword():
         payload = ChangePasswordSchema().load(request.get_json())
         result = usersSrv().changePasswordSrv(payload)
         return jsonify(result), result["status"]
 
     @users.route('/api/users/confirm_registration', methods=['POST'])
+    @rate_limit()
     def confirmRegistration():
         payload = ConfirmRegistrationSchema().load(request.get_json())
         result = usersSrv().confirmRegistrationSrv(payload)

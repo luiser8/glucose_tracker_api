@@ -9,7 +9,7 @@ from middleware.randomCode import randomCode
 
 class usersSrv():
     def __init__(self):
-        self.query_service = repoSQL('users', ['id', 'firstname', 'lastname', 'email', 'phone', 'password', 'status'])
+        self.query_service = repoSQL('users', ['id', 'firstname', 'lastname', 'email', 'password', 'status'])
         self.users_personal_data_service = usersPersonalDataSrv()
         self.mailer_send_service = mailerSendSrv()
         self.users_registration_service = usersRegistrationSrv()
@@ -41,7 +41,6 @@ class usersSrv():
                     "firstname": payload["firstname"],
                     "lastname": payload["lastname"],
                     "email": payload["email"],
-                    "phone": payload["phone"],
                     "password": hash_password(payload["password"])
                 }
                 if "id" in payload:
@@ -53,6 +52,7 @@ class usersSrv():
                 if result:
                     self.users_personal_data_service.postSrv({
                         "user_id": result,
+                        "phone": payload["phone"],
                         "sex": payload["sex"],
                         "address": payload["address"],
                         "date_of_birth": payload["date_of_birth"],
@@ -81,7 +81,6 @@ class usersSrv():
                 "firstname": payload["firstname"],
                 "lastname": payload["lastname"],
                 "email": payload["email"],
-                "phone": payload["phone"],
                 "password": hash_password(payload["password"])
             }
             if "id" in payload:
@@ -92,6 +91,7 @@ class usersSrv():
 
             if result:
                 self.users_personal_data_service.putSrv(id, {
+                    "phone": payload["phone"],
                     "sex": payload["sex"],
                     "address": payload["address"],
                     "date_of_birth": payload["date_of_birth"],
