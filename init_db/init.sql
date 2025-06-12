@@ -12,7 +12,6 @@ CREATE TABLE users (
 CREATE TABLE users_personal_data (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
-    photo BYTEA NULL,
     phone VARCHAR NULL,
     sex VARCHAR NOT NULL,
     address VARCHAR NOT NULL,

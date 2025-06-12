@@ -25,7 +25,7 @@ class authSrv:
                 }],
                 select_columns=[
                     'users.id', 'users.email', 'users.firstname',
-                    'users.lastname', 'users.status', 'users_personal_data.photo',
+                    'users.lastname', 'users.status',
                     'users_personal_data.phone', 'users_personal_data.sex',
                     'users_personal_data.address', 'users_personal_data.date_of_birth',
                     'users_personal_data.country', 'users_personal_data.city'
@@ -66,7 +66,7 @@ class authSrv:
                 }],
                 select_columns=[
                     'users.id', 'users.email', 'users.firstname',
-                    'users.lastname', 'users.status', 'users_personal_data.photo',
+                    'users.lastname', 'users.status',
                     'users_personal_data.phone', 'users_personal_data.sex',
                     'users_personal_data.address', 'users_personal_data.date_of_birth',
                     'users_personal_data.country', 'users_personal_data.city'
